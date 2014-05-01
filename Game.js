@@ -100,8 +100,8 @@ Game.prototype.SetSize = function () {
     this.scale = scaleFactor;
     
     // Find left and top of game location
-    this.left = (window.innerWidth * 0.5) - ((this.width * this.scale) * 0.5);
-    this.top = (window.innerHeight * 0.5) - ((this.height * this.scale) * 0.5);
+    this.left = 0;//(window.innerWidth * 0.5) - ((this.width * this.scale) * 0.5);
+    this.top = 0;//(window.innerHeight * 0.5) - ((this.height * this.scale) * 0.5);
 
     // Set width and height of canvases
     this.bgCanvas.width = this.width * this.scale;
