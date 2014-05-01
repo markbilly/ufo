@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<widget xmlns = "http://www.w3.org/ns/widgets"
+    xmlns:gap = "http://phonegap.com/ns/1.0"
+    id        = "com.bitsharpgames"
+    version   = "0.1.0">
+
+<name>I Want To Believe</name>
+
+<description>
+I Want To Believe
+</description>
+
+<author href="http://www.bitsharpgames.com" email="mark.billy@gmail.com">
+Mark Richards
+</author>
+
+<preference name="phonegap-version" value="2.9.0" />
+<preference name="orientation" value="landscape" />
+<preference name="fullscreen" value="true" />
+<preference name="webviewbounce" value="false" />
+<preference name="exit-on-suspend" value="false" />
+<preference name="permissions" value="none"/>
+
+<!-- Icons -->
+
+<icon src="icon.png" />
+</widget>
