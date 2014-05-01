@@ -97,7 +97,7 @@ Game.prototype.SetSize = function () {
     if (scaleFactor > 3) scaleFactor = 3;
 
     // Set scale factor as game property
-    this.scale = scaleFactor;
+    this.scale = 1;//scaleFactor;
     
     // Find left and top of game location
     this.left = 0;//(window.innerWidth * 0.5) - ((this.width * this.scale) * 0.5);
