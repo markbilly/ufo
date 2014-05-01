@@ -14,7 +14,7 @@ I Want To Believe
 Mark Richards
 </author>
 
-<preference name="phonegap-version" value="2.9.0" />
+<preference name="phonegap-version" value="3.3.0" />
 <preference name="orientation" value="landscape" />
 <preference name="fullscreen" value="true" />
 <preference name="webviewbounce" value="false" />
