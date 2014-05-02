@@ -2,6 +2,10 @@
     this.content = document.getElementById("content");
     this.bgCanvas = document.getElementById("cBackground");
     this.bgCanvasCtx = this.bgCanvas.getContext("2d");
+    this.skyCanvas = document.getElementById("cSky");
+    this.skyCanvasCtx = this.skyCanvas.getContext("2d");
+    this.spCanvas = document.getElementById("cSprite");
+    this.spCanvasCtx = this.spCanvas.getContext("2d");
     this.fgCanvas = document.getElementById("cForeground");
     this.fgCanvasCtx = this.fgCanvas.getContext("2d");
     this.scale = 1;
@@ -109,6 +113,14 @@ Game.prototype.SetSize = function () {
     this.bgCanvas.height = this.height * this.scale;
     this.bgCanvas.style.left = this.left + "px";
     this.bgCanvas.style.top = this.top + "px";
+    this.skyCanvas.width = this.width * this.scale;
+    this.skyCanvas.height = this.height * this.scale;
+    this.skyCanvas.style.left = this.left + "px";
+    this.skyCanvas.style.top = this.top + "px";
+    this.spCanvas.width = this.width * this.scale;
+    this.spCanvas.height = this.height * this.scale;
+    this.spCanvas.style.left = this.left + "px";
+    this.spCanvas.style.top = this.top + "px";
     this.fgCanvas.width = this.width * this.scale;
     this.fgCanvas.height = this.height * this.scale;
     this.fgCanvas.style.left = this.left + "px";
@@ -544,33 +556,39 @@ Game.prototype.Update = function () {
     this.UpdateEnergyLevel();
 };
 
-Game.prototype.Draw = function () {
-    // Text setup
-    this.bgCanvasCtx.font = "" + 8 * this.scale + "px pixel";
-    this.bgCanvasCtx.fillStyle = "white";
-
+Game.prototype.DrawBg = function () {
     // Draw background
     this.bgCanvasCtx.drawImage(this.bgImage, 0, 0, this.width * this.scale, this.height * this.scale);
+};
+
+Game.prototype.Draw = function () {
+    // Clear canvases
+    this.skyCanvasCtx.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
+    this.spCanvasCtx.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
+
+    // Text setup
+    this.spCanvasCtx.font = "" + 8 * this.scale + "px pixel";
+    this.spCanvasCtx.fillStyle = "white";
 
     // Draw sprites - clouds, etc
     for (var i = 0; i < 4; i++)
-        this.sprites[i].Draw(this.bgCanvasCtx, this.scale);
+        this.sprites[i].Draw(this.skyCanvasCtx, this.scale);
 
     // Draw ufo
-    this.ufo.Draw(this.bgCanvasCtx, this.scale);
+    this.ufo.Draw(this.spCanvasCtx, this.scale);
 
     // Draw abductee
-    this.abductee.Draw(this.bgCanvasCtx, this.scale);
+    this.abductee.Draw(this.spCanvasCtx, this.scale);
     
     // Draw sprites - houses
     for (var i = 4; i < this.sprites.length; i++)
-        this.sprites[i].Draw(this.bgCanvasCtx, this.scale);
+        this.sprites[i].Draw(this.spCanvasCtx, this.scale);
     
     // Draw sedan
-    this.sedan.Draw(this.bgCanvasCtx, this.scale);
+    this.sedan.Draw(this.spCanvasCtx, this.scale);
 
     // Draw alert message
-    this.bgCanvasCtx.fillText
+    this.spCanvasCtx.fillText
     (
         this.alert.message,
         this.alert.x * this.scale,
@@ -578,19 +596,19 @@ Game.prototype.Draw = function () {
     );
 
     // Draw house label
-    this.bgCanvasCtx.globalAlpha = this.currentHouse.opacity;
+    this.spCanvasCtx.globalAlpha = this.currentHouse.opacity;
     if (this.currentHouse.residents > 0) {
-        this.bgCanvasCtx.fillText
+        this.spCanvasCtx.fillText
         (
             this.currentHouse.residents,
             this.currentHouse.x * this.scale,
             this.currentHouse.y * this.scale
         );
     }
-    this.bgCanvasCtx.globalAlpha = 1;
+    this.spCanvasCtx.globalAlpha = 1;
     
     // Draw energy
-    this.bgCanvasCtx.fillText
+    this.spCanvasCtx.fillText
     (
         "Energy:" + this.score + "",
         2 * this.scale,
@@ -598,7 +616,7 @@ Game.prototype.Draw = function () {
     );
 
     // Draw timer
-    this.bgCanvasCtx.fillText
+    this.spCanvasCtx.fillText
     (
         this.timer.string,
         260 * this.scale,

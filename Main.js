@@ -24,6 +24,9 @@ window.onload = function () {
         // Set the size of the game
         game.SetSize();
 
+        // Draw background
+        game.DrawBg();
+
         // World stuff
         Update(game);
     }, 1000);
