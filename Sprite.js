@@ -14,22 +14,11 @@
     this.acceleration = 0.2;
     this.visible = true;
     this.defaultDraw = document.createElement("canvas");
-    this.loaded = false;
 }
 
 Sprite.prototype.Load = function() {
     // Load image
     this.image.src = this.src;
-
-    // Setup default off-screen draw
-    this.defaultDraw.width = this.width * this.assetScale;
-    this.defaultDraw.height = this.height * this.assetScale;
-    var context = this.defaultDraw.getContext("2d");
-    //this.Draw(context, this.assetScale);
-    context.drawImage(this.image, 0, 0, this.width * this.assetScale, this.height * this.assetScale);
-
-    // Set flag
-    this.loaded = true;
 };
 
 Sprite.prototype.Move = function (move) {
@@ -40,17 +29,15 @@ Sprite.prototype.Move = function (move) {
     this.x = Math.floor(this.xf);
 };
 
+Sprite.prototype.Clear = function (ctx, scale) {
+    // Clear the canvas area sprite occupies
+    ctx.clearRect(this.x * scale, this.y * scale, this.width * scale, this.height * scale);
+};
+
 Sprite.prototype.Draw = function (ctx, scale) {
     // Don't draw if not visible
     if (!this.visible)
         return;
-
-    // If frame is 0 (most common)
-    // Then just draw the pre-rendered
-    //if (this.loaded && this.frame == 0) {
-    //    ctx.drawImage(this.defaultDraw, this.x * scale, this.y * scale);
-    //    return;
-    //}
 
     // Take frame into account
     var offsetX = this.frame * this.width;

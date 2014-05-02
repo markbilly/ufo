@@ -6,6 +6,8 @@
     this.skyCanvasCtx = this.skyCanvas.getContext("2d");
     this.spCanvas = document.getElementById("cSprite");
     this.spCanvasCtx = this.spCanvas.getContext("2d");
+    this.txtCanvas = document.getElementById("cText");
+    this.txtCanvasCtx = this.txtCanvas.getContext("2d");
     this.fgCanvas = document.getElementById("cForeground");
     this.fgCanvasCtx = this.fgCanvas.getContext("2d");
     this.scale = 1;
@@ -121,6 +123,10 @@ Game.prototype.SetSize = function () {
     this.spCanvas.height = this.height * this.scale;
     this.spCanvas.style.left = this.left + "px";
     this.spCanvas.style.top = this.top + "px";
+    this.txtCanvas.width = this.width * this.scale;
+    this.txtCanvas.height = this.height * this.scale;
+    this.txtCanvas.style.left = this.left + "px";
+    this.txtCanvas.style.top = this.top + "px";
     this.fgCanvas.width = this.width * this.scale;
     this.fgCanvas.height = this.height * this.scale;
     this.fgCanvas.style.left = this.left + "px";
@@ -490,7 +496,7 @@ Game.prototype.UpdateFBI = function () {
         // don't make it then game over. So will need another state
         // like .fbiParkedup and only do the distance/game over check
         // once we are in this state.
-        if (this.ufo.x - this.sedan.x < this.ufo.width) {
+        if (!this.gameOver.over && this.ufo.x - this.sedan.x < this.ufo.width) {
             this.gameOver.ticks = this.ticker;
             this.alert.message = "";
             this.gameOver.over = true;
@@ -508,6 +514,12 @@ Game.prototype.UpdateFBI = function () {
 
     // Move the target x
     this.fbiTargetX += this.move * this.sedan.speed;
+
+    // Don't draw if off-screen
+    if (this.sedan.x < -90)
+        this.sedan.visible = false;
+    else
+        this.sedan.visible = true;
 };
 
 Game.prototype.UpdateEnergyLevel = function () {
@@ -559,17 +571,32 @@ Game.prototype.Update = function () {
 Game.prototype.DrawBg = function () {
     // Draw background
     this.bgCanvasCtx.drawImage(this.bgImage, 0, 0, this.width * this.scale, this.height * this.scale);
+
+    // Text setup
+    this.txtCanvasCtx.font = "" + 8 * this.scale + "px pixel";
+    this.txtCanvasCtx.fillStyle = "white";
+};
+
+Game.prototype.Clear = function () {
+    // Clear sprites - clouds, etc
+    for (var i = 0; i < 4; i++)
+        this.sprites[i].Clear(this.skyCanvasCtx, this.scale);
+
+    // Clear ufo
+    this.ufo.Clear(this.spCanvasCtx, this.scale);
+
+    // Clear sprites - houses
+    for (var i = 4; i < this.sprites.length; i++)
+        this.sprites[i].Clear(this.spCanvasCtx, this.scale);
+
+    // Clear sedan
+    this.sedan.Clear(this.spCanvasCtx, this.scale);
+
+    // Clear txt canvas
+    this.txtCanvasCtx.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
 };
 
 Game.prototype.Draw = function () {
-    // Clear canvases
-    this.skyCanvasCtx.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
-    this.spCanvasCtx.clearRect(0, 0, this.width * this.scale, this.height * this.scale);
-
-    // Text setup
-    this.spCanvasCtx.font = "" + 8 * this.scale + "px pixel";
-    this.spCanvasCtx.fillStyle = "white";
-
     // Draw sprites - clouds, etc
     for (var i = 0; i < 4; i++)
         this.sprites[i].Draw(this.skyCanvasCtx, this.scale);
@@ -588,27 +615,30 @@ Game.prototype.Draw = function () {
     this.sedan.Draw(this.spCanvasCtx, this.scale);
 
     // Draw alert message
-    this.spCanvasCtx.fillText
-    (
-        this.alert.message,
-        this.alert.x * this.scale,
-        this.alert.y * this.scale
-    );
+    // Only if there is one
+    if (this.alert.message != "") {
+        this.txtCanvasCtx.fillText
+        (
+            this.alert.message,
+            this.alert.x * this.scale,
+            this.alert.y * this.scale
+        );
+    }
 
     // Draw house label
-    this.spCanvasCtx.globalAlpha = this.currentHouse.opacity;
+    this.txtCanvasCtx.globalAlpha = this.currentHouse.opacity;
     if (this.currentHouse.residents > 0) {
-        this.spCanvasCtx.fillText
+        this.txtCanvasCtx.fillText
         (
             this.currentHouse.residents,
             this.currentHouse.x * this.scale,
             this.currentHouse.y * this.scale
         );
     }
-    this.spCanvasCtx.globalAlpha = 1;
+    this.txtCanvasCtx.globalAlpha = 1;
     
     // Draw energy
-    this.spCanvasCtx.fillText
+    this.txtCanvasCtx.fillText
     (
         "Energy:" + this.score + "",
         2 * this.scale,
@@ -616,7 +646,7 @@ Game.prototype.Draw = function () {
     );
 
     // Draw timer
-    this.spCanvasCtx.fillText
+    this.txtCanvasCtx.fillText
     (
         this.timer.string,
         260 * this.scale,
@@ -626,16 +656,15 @@ Game.prototype.Draw = function () {
     // FOREGROUND STUFF
 
     // Pause screen
-    this.pauseScreen.Clear(this.scale);
-    if (this.paused)
-        this.pauseScreen.Draw(this.scale);
+    if (!this.gameOver.ready) {
+        this.pauseScreen.Clear(this.scale);
+        if (this.paused)
+            this.pauseScreen.Draw(this.scale);
+    }
 
     // GameOver screen
     if (this.gameOver.ready)
         this.gameOver.screen.Draw(this.gameOver.message, this.scale, this.timer.string);
-
-    var message = document.getElementById("Message");
-    message.innerHTML = this.debugMessage;
 };
 
 //////////////////

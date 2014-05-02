@@ -47,6 +47,9 @@ function Update(game) {
         else
             game.ProcessKeys(left, right, beam);
 
+        // Clear canvases
+        game.Clear();
+
         // Update the game
         game.paused = paused;
         game.Update();
