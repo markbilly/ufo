@@ -26,7 +26,6 @@ window.onload = function () {
 
         // World stuff
         Update(game);
-        Draw(game);
     }, 1000);
 };
 
@@ -36,7 +35,7 @@ window.onload = function () {
 
 function Update(game) {
     // Call loop function
-    loop();
+    window.requestAnimFrame(loop);
 
     function loop() {
         // Process clicks
@@ -49,21 +48,11 @@ function Update(game) {
         game.paused = paused;
         game.Update();
 
-        // Callback itself to loop
-        requestAnimationFrame(loop);
-    }
-}
-
-function Draw(game) {
-    // Call loop function
-    loop();
-
-    function loop() {
         // Draw the game
         game.Draw();
 
         // Callback itself to loop
-        requestAnimationFrame(loop);
+        window.requestAnimFrame(loop);
     }
 }
 
@@ -110,3 +99,18 @@ function SetupKeyboardEvents() {
             beam = false;
     }, true);
 }
+
+
+// Animation help
+window.requestAnimFrame = function () {
+    return (
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (/* function */ callback) {
+            window.setTimeout(callback, 1000 / 60);
+        }
+    );
+}();

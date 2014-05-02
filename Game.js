@@ -26,9 +26,9 @@
     this.sprites =
     [
         new Sprite(250, 20, 40, 40, 0.002, "Content/moon.png"),
-        new Sprite(-20, 65, 72, 12, 0.02, "Content/cloud.png"),
-        new Sprite(100, 30, 72, 12, 0.02, "Content/cloud.png"),
-        new Sprite(220, 50, 72, 12, 0.02, "Content/cloud.png"),
+        new Sprite(-20, 65, 70, 12, 0.02, "Content/cloud.png"),
+        new Sprite(100, 30, 70, 12, 0.02, "Content/cloud.png"),
+        new Sprite(220, 50, 70, 12, 0.02, "Content/cloud.png"),
         new Sprite(-80, 130, 80, 43, 2, "Content/house.png"),
         new Sprite(0, 130, 80, 43, 2, "Content/house.png"),
         new Sprite(80, 130, 80, 43, 2, "Content/house.png"),
@@ -55,6 +55,7 @@
     this.currentHouse = {
         index: 0,
         residents: 0,
+        opacity: 0,
         x: 0,
         y: 0
     };
@@ -97,11 +98,11 @@ Game.prototype.SetSize = function () {
     if (scaleFactor > 3) scaleFactor = 3;
 
     // Set scale factor as game property
-    this.scale = 1;//scaleFactor;
+    this.scale = scaleFactor;
     
     // Find left and top of game location
-    this.left = 0;//(window.innerWidth * 0.5) - ((this.width * this.scale) * 0.5);
-    this.top = 0;//(window.innerHeight * 0.5) - ((this.height * this.scale) * 0.5);
+    this.left = (window.innerWidth * 0.5) - ((this.width * this.scale) * 0.5);
+    this.top = (window.innerHeight * 0.5) - ((this.height * this.scale) * 0.5);
 
     // Set width and height of canvases
     this.bgCanvas.width = this.width * this.scale;
@@ -298,6 +299,11 @@ Game.prototype.UpdateBeamEffects = function () {
         this.ufo.frame = 0;
         this.ufo.clip = [0, 0, this.ufo.width, 24];
     }
+
+    // Make sure image dimensions don't overshoot
+    // So we can draw without crashes
+    if (this.ufo.height > 101) this.ufo.height = 101;
+    if (this.ufo.clip[3] > 101) this.ufo.clip[3] = 101;
 };
 
 Game.prototype.UpdateAbductee = function () {
@@ -355,6 +361,13 @@ Game.prototype.UpdateAbductee = function () {
         this.abductee.visible = false;
     if (this.currentHouse.residents < 1) // invisible if no abductees left
         this.abductee.visible = false;
+
+    // Set house label opacity
+    var dist = (Math.abs((this.ufo.x + 50) - (this.sprites[this.currentHouse.index].x + 60)));
+    var op = 1 - (dist / 45);
+    if (op > 1) op = 1;
+    this.currentHouse.opacity = op;
+    this.debugMessage = dist.toString();
 
     // Position house label right
     this.currentHouse.x = this.sprites[this.currentHouse.index].x + 10;
@@ -565,12 +578,16 @@ Game.prototype.Draw = function () {
     );
 
     // Draw house label
-    this.bgCanvasCtx.fillText
-    (
-        this.currentHouse.residents,
-        this.currentHouse.x * this.scale,
-        this.currentHouse.y * this.scale
-    );
+    this.bgCanvasCtx.globalAlpha = this.currentHouse.opacity;
+    if (this.currentHouse.residents > 0) {
+        this.bgCanvasCtx.fillText
+        (
+            this.currentHouse.residents,
+            this.currentHouse.x * this.scale,
+            this.currentHouse.y * this.scale
+        );
+    }
+    this.bgCanvasCtx.globalAlpha = 1;
     
     // Draw energy
     this.bgCanvasCtx.fillText
@@ -598,6 +615,9 @@ Game.prototype.Draw = function () {
     // GameOver screen
     if (this.gameOver.ready)
         this.gameOver.screen.Draw(this.gameOver.message, this.scale, this.timer.string);
+
+    var message = document.getElementById("Message");
+    message.innerHTML = this.debugMessage;
 };
 
 //////////////////
