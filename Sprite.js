@@ -14,9 +14,15 @@
     this.acceleration = 0.2;
     this.visible = true;
     this.defaultDraw = document.createElement("canvas");
+    // Optimisation properties
+    this.lastX = this.x;
+    this.lastY = this.y;
+    this.lastWidth = this.width;
+    this.lastHeight = this.height;
+    this.lastFrame = this.frame;
 }
 
-Sprite.prototype.Load = function() {
+Sprite.prototype.Load = function () {
     // Load image
     this.image.src = this.src;
 };
@@ -29,9 +35,27 @@ Sprite.prototype.Move = function (move) {
     this.x = Math.floor(this.xf);
 };
 
+Sprite.prototype.UpdateLasts = function () {
+    this.lastX = this.x;
+    this.lastY = this.y;
+    this.lastWidth = this.width;
+    this.lastHeight = this.height;
+    this.lastFrame = this.frame;
+};
+
+Sprite.prototype.ShouldClear = function () {
+    // Return true if changed
+    if (this.lastX != this.x ||
+        this.lastY != this.y ||
+        this.lastWidth != this.width ||
+        this.lastHeight != this.height ||
+        this.lastFrame != this.frame)
+        return true;
+};
+
 Sprite.prototype.Clear = function (ctx, scale) {
     // Clear the canvas area sprite occupies
-    ctx.clearRect(this.x * scale, this.y * scale, this.width * scale, this.height * scale);
+    ctx.clearRect(this.lastX * scale, this.lastY * scale, this.lastWidth * scale, this.lastHeight * scale);
 };
 
 Sprite.prototype.Draw = function (ctx, scale) {
@@ -49,9 +73,12 @@ Sprite.prototype.Draw = function (ctx, scale) {
         this.clip[1] * this.assetScale,
         this.clip[2] * this.assetScale,
         this.clip[3] * this.assetScale,
-        this.x * scale, 
-        this.y * scale, 
-        this.width * scale, 
+        this.x * scale,
+        this.y * scale,
+        this.width * scale,
         this.height * scale
     );
+
+    // Update last values
+    this.UpdateLasts();
 };
